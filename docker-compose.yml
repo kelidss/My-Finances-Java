@@ -1,16 +1,30 @@
-version: '3'
 services:
   db:
-    image: mysql:8
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: finance_control
+    container_name: "my_finance_db"
+    image: postgres:12.5-alpine
+    env_file:
+      - .env
     ports:
-      - "3306:3306"
+      - "5432:5432"
+    networks:
+      - my_finance_network
+    volumes:
+      - db:/var/lib/postgres
 
-  app:
-    build: .
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
+  # app:
+  #   container_name: "my_finance_app"
+  #   build: .
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - my_finance_network
+
+networks:
+  my_finance_network:
+    driver: bridge
+
+volumes:
+  db:
+  

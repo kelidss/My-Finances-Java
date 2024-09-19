@@ -6,6 +6,8 @@
     <title>Controle Financeiro Pessoal</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Incluindo o Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -33,7 +35,7 @@
             </section>
 
             <section id="transacoes">
-                <h2>Transações</h2>
+                <h2>Transações</h2> 
                 <ul id="lista-transacoes"></ul>
             </section>
 
@@ -42,14 +44,17 @@
                 <div id="total-mes" class="total-mes">
                     <p>Total: <span id="valor-total">R$ 0,00</span></p>
                 </div>
-                <div id="grafico"></div> 
+                <!-- Canvas para o gráfico -->
+                <div id="grafico">
+                    <canvas id="despesas-chart" width="400" height="200"></canvas>
+                </div>
             </section>
 
             <section id="acesso-rapido">
-                <div class="btn-acesso"><i class="fas fa-money-bill-wave"></i> Despesa</div>
-                <div class="btn-acesso"><i class="fas fa-credit-card"></i> Receita</div>
+                <div class="btn-acesso"><i class="fas fa-wallet"></i> Despesa</div>
+                <div class="btn-acesso"><i class="fas fa-donate"></i> Receita</div>
                 <div class="btn-acesso"><i class="fas fa-exchange-alt"></i> Transf.</div>
-                <div class="btn-acesso"><i class="fas fa-file-import"></i> Importar</div>
+                <div class="btn-acesso"><i class="fas fa-upload"></i> Importar</div>
             </section>
         </main>
     </div>
