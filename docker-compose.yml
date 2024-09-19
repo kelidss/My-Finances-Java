@@ -1,28 +1,30 @@
 services:
   db:
-    container_name: "my_finance_db"
+    container_name: "my_finances_db"
     image: postgres:12.5-alpine
     env_file:
       - .env
     ports:
       - "5432:5432"
     networks:
-      - my_finance_network
+      - my_finances_network
     volumes:
       - db:/var/lib/postgres
 
-  # app:
-  #   container_name: "my_finance_app"
-  #   build: .
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - db
-  #   networks:
-  #     - my_finance_network
+  app:
+    container_name: "my_finances_app"
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - my_finances_network
 
 networks:
-  my_finance_network:
+  my_finances_network:
     driver: bridge
 
 volumes:
