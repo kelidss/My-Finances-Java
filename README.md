@@ -21,7 +21,9 @@ Projeto da faculdade para trabalho de Java.
 2. Instalar dependencias com `mvnw.cmd clean install`
 3. Rodar o projeto `mvnw.cmd spring-boot:run`.
 
-#### OBS: Lembre-se que o Wrapper do Maven não rodará o banco, isso é possível somente com o Docker Compose
+#### OBS 1: Lembre-se que o Wrapper do Maven não rodará o banco, isso é possível somente com o Docker Compose
+
+#### OBS 2: Toda alteração no código e/ou estrutura de pastas, deve ser compilada com `./mvnw clean install` ou `mvnw.cmd clean install`
 
 ## Como usar o projeto
 
