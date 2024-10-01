@@ -9,29 +9,30 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.api.my_finances.models.Category;
-import com.api.my_finances.services.CategoryService;
+import com.api.my_finances.models.Transaction;
+import com.api.my_finances.services.TransactionService;
+
 import java.util.List;
 
 @RestController
-@RequestMapping("categorys")
-public class CategoryController {
+@RequestMapping("transactions")
+public class TransactionController {
 
     @Autowired
-    CategoryService categoryService;
+    TransactionService transactionService;
 
     @GetMapping
-    public List<Category> listCategorys(){
-        return categoryService.listAll();
+    public List<Transaction> listTransactions(){
+        return transactionService.listAll();
     }
 
     @PostMapping
-    public Category createCategory(@RequestBody Category category){
-        return categoryService.save(category);
+    public Transaction saveTransaction(@RequestBody Transaction transaction) {
+        return transactionService.save(transaction);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCategory(@PathVariable Long id){
-        categoryService.delete(id);
+    public void deleteTransaction(@PathVariable Long id){
+        transactionService.delete(id);
     }
 }

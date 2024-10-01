@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -16,7 +17,9 @@ public class Transaction {
 
     private String description;
     private Float value;
-    private String category;
+    
+    @ManyToOne  // ForeingKey ManyToOne
+    private Category category;
 
     public Long getId() {
         return id;
@@ -36,10 +39,10 @@ public class Transaction {
     public void setValue(Float value) {
         this.value = value;
     }
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
-    public void setCategory(String category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
 }
