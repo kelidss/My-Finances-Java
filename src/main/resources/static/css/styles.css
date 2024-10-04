@@ -48,6 +48,7 @@ form {
     flex-direction: column;
 }
 
+select[type="text"],
 input[type="text"],
 input[type="number"] {
     padding: 12px;

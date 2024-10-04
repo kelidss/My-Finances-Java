@@ -10,45 +10,52 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let despesasChart = null; 
 
-    function carregarCategorias() {
-        fetch('/api/categorias')
+    function loadCategorys() {
+        fetch('/categorys')
             .then(response => response.json())
-            .then(categorias => {
-                selectCategoria.innerHTML = ''; 
-                categorias.forEach(categoria => {
+            .then(categorys => {
+                selectCategoria.innerHTML = '';
+
+                // Adiciona a opção padrão "Categoria"
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'Categoria';
+                selectCategoria.appendChild(defaultOption);
+
+                categorys.forEach(category => {
                     const option = document.createElement('option');
-                    option.value = categoria.id;
-                    option.textContent = categoria.nome;
+                    option.value = category.id;
+                    option.textContent = category.name;
                     selectCategoria.appendChild(option);
                 });
             })
             .catch(error => console.error('Erro ao carregar categorias:', error));
     }
 
-    function carregarTransacoes() {
-        fetch('/api/transacoes')
+    function loadTransactions() {
+        fetch('/transactions')
             .then(response => response.json())
-            .then(transacoes => {
-                listaTransacoes.innerHTML = ''; 
+            .then(transactions => { 
                 let total = 0;
                 let receitaTotal = 0;
                 let despesaTotal = 0;
                 const despesasCategoria = {}; 
+                listaTransacoes.innerHTML = '';
 
-                transacoes.forEach(transacao => {
+                transactions.forEach(transaction => {
                     const li = document.createElement('li');
-                    li.textContent = `${transacao.descricao} - R$ ${transacao.valor.toFixed(2)} - Categoria: ${transacao.categoria.nome}`;
+                    li.textContent = `${transaction.description} - R$ ${transaction.value.toFixed(2)} - Categoria: ${transaction.category.name}`;
                     listaTransacoes.appendChild(li);
-                    total += transacao.valor;
-                    if (transacao.valor > 0) {
-                        receitaTotal += transacao.valor;
+                    total += transaction.value;
+                    if (transaction.value > 0) {
+                        receitaTotal += transaction.value;
                     } else {
-                        despesaTotal += Math.abs(transacao.valor);
+                        despesaTotal += Math.abs(transaction.value);
                        
-                        if (!despesasCategoria[transacao.categoria.nome]) {
-                            despesasCategoria[transacao.categoria.nome] = 0;
+                        if (!despesasCategoria[transaction.category.name]) {
+                            despesasCategoria[transaction.category.name] = 0;
                         }
-                        despesasCategoria[transacao.categoria.nome] += Math.abs(transacao.valor);
+                        despesasCategoria[transaction.category.name] += Math.abs(transaction.value);
                     }
                 });
 
@@ -96,17 +103,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     formCategoria.addEventListener('submit', function(event) {
         event.preventDefault();
-        const nome = document.getElementById('categoria-nome').value;
-        fetch('/api/categorias', {
+        const name = document.getElementById('categoria-nome').value;
+        fetch('categorys', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ nome })
+            body: JSON.stringify({
+                "name": name
+            })
         })
         .then(response => response.json())
         .then(() => {
-            carregarCategorias(); 
+            loadCategorys(); 
             formCategoria.reset();
         })
         .catch(error => console.error('Erro ao adicionar categoria:', error));
@@ -114,24 +123,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     formTransacao.addEventListener('submit', function(event) {
         event.preventDefault();
-        const descricao = document.getElementById('transacao-descricao').value;
-        const valor = parseFloat(document.getElementById('transacao-valor').value);
-        const categoriaId = parseInt(document.getElementById('transacao-categoria').value);
-        fetch('/api/transacoes', {
+        const description = document.getElementById('transacao-descricao').value;
+        const value = parseFloat(document.getElementById('transacao-valor').value);
+        const category_id = parseInt(document.getElementById('transacao-categoria').value);
+        fetch('/transactions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ descricao, valor, categoria_id: categoriaId })
+            body: JSON.stringify({ 
+                "description": description,
+                "value": value,
+                "category": {
+                    "id": category_id
+                }
+            })
         })
         .then(response => response.json())
         .then(() => {
-            carregarTransacoes();
+            loadTransactions();
             formTransacao.reset(); 
         })
         .catch(error => console.error('Erro ao adicionar transação:', error));
     });
 
-    carregarCategorias();
-    carregarTransacoes();
+    loadCategorys();
+    loadTransactions();
 });
