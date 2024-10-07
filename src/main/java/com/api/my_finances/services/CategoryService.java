@@ -14,14 +14,38 @@ public class CategoryService {
     private CategoryRepository categoryRepository;
 
     public List<Category> listAll(){
-        return categoryRepository.findAll();
+        try{
+            return categoryRepository.findAll();
+        } catch (Exception e){
+            throw new RuntimeException("Não possivel carregar as caregorias no momento");
+        }
     }
 
     public Category save(Category category){
-        return categoryRepository.save(category);
+        
+        // verifica se nome nao e vazio
+        if(category == null || category.getName() == null || category.getName().trim().isEmpty()){
+            throw new IllegalArgumentException("O nome da categoria não pode estar vazio");
+        }
+
+        // validacao para verificar se a categoria tem um nome especifico
+        if("Categoria".equals(category.getName())) {
+            throw new IllegalArgumentException("Preencha uma categoria válida");
+        }
+
+        // verifica se o nome ja existe
+        if(categoryRepository.existsByName(category.getName())) {
+            throw new IllegalArgumentException("Essa categoria já existe.");
+        }
+
+        return categoryRepository.save(category); // retorna o ID
     }
 
-    public void delete(Long id){
+    public String delete(Long id){
+        if(!categoryRepository.existsById(id)){
+            throw new IllegalArgumentException("ID não existe.");
+        }
         categoryRepository.deleteById(id);
+        return "Deletado com sucesso";
     }
 }
