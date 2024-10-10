@@ -1,71 +1,66 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const formCategoria = document.getElementById('form-categoria');
-    const formTransacao = document.getElementById('form-transacao');
-    const listaTransacoes = document.getElementById('lista-transacoes');
+    const formCategory = document.getElementById('form-categoria');
+    const formTransaction = document.getElementById('form-transacao');
+    const listTransactions = document.getElementById('lista-transacoes');
     const saldoGeral = document.getElementById('valor-total');
     const receitas = document.getElementById('receitas');
     const despesas = document.getElementById('despesas');
-    const selectCategoria = document.getElementById('transacao-categoria');
+    const selectCategory = document.getElementById('transacao-categoria');
     const ctx = document.getElementById('despesas-chart').getContext('2d'); 
 
     let despesasChart = null; 
 
-    function loadCategorys() {
-        fetch('/categorys')
-            .then(response => response.json())
-            .then(categorys => {
-                selectCategoria.innerHTML = '';
+    async function loadCategories() {
+        const response = await fetch('/categorys');
+        const categories = await response.json();
 
-                // Adiciona a opção padrão "Categoria"
-                const defaultOption = document.createElement('option');
-                defaultOption.value = '';
-                defaultOption.textContent = 'Categoria';
-                selectCategoria.appendChild(defaultOption);
+        selectCategory.innerHTML = '';
 
-                categorys.forEach(category => {
-                    const option = document.createElement('option');
-                    option.value = category.id;
-                    option.textContent = category.name;
-                    selectCategoria.appendChild(option);
-                });
-            })
-            .catch(error => console.error('Erro ao carregar categorias:', error));
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Categoria';
+        selectCategory.appendChild(defaultOption);
+
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = category.name;
+            selectCategory.appendChild(option);
+        });
     }
 
-    function loadTransactions() {
-        fetch('/transactions')
-            .then(response => response.json())
-            .then(transactions => { 
-                let total = 0;
-                let receitaTotal = 0;
-                let despesaTotal = 0;
-                const despesasCategoria = {}; 
-                listaTransacoes.innerHTML = '';
+    async function loadTransactions() {
+        const response = await fetch('/transactions');
+        const transactions = await response.json();
+                
+        let total = 0;
+        let receitaTotal = 0;
+        let despesaTotal = 0;
+        const despesasCategoria = {}; 
+        listTransactions.innerHTML = '';
 
-                transactions.forEach(transaction => {
-                    const li = document.createElement('li');
-                    li.textContent = `${transaction.description} - R$ ${transaction.value.toFixed(2)} - Categoria: ${transaction.category.name}`;
-                    listaTransacoes.appendChild(li);
-                    total += transaction.value;
-                    if (transaction.value > 0) {
-                        receitaTotal += transaction.value;
-                    } else {
-                        despesaTotal += Math.abs(transaction.value);
-                       
-                        if (!despesasCategoria[transaction.category.name]) {
-                            despesasCategoria[transaction.category.name] = 0;
-                        }
-                        despesasCategoria[transaction.category.name] += Math.abs(transaction.value);
-                    }
-                });
+        transactions.forEach(transaction => {
+            const li = document.createElement('li');
+            li.textContent = `${transaction.description} - R$ ${transaction.value.toFixed(2)} - Categoria: ${transaction.category.name}`;
+            listTransactions.appendChild(li);
+            total += transaction.value;
+            if (transaction.value > 0) {
+                receitaTotal += transaction.value;
+            } else {
+                despesaTotal += Math.abs(transaction.value);
+                
+                if (!despesasCategoria[transaction.category.name]) {
+                    despesasCategoria[transaction.category.name] = 0;
+                }
+                despesasCategoria[transaction.category.name] += Math.abs(transaction.value);
+            }
+        });
 
-                saldoGeral.textContent = `R$ ${total.toFixed(2)}`;
-                receitas.textContent = `R$ ${receitaTotal.toFixed(2)}`;
-                despesas.textContent = `R$ ${despesaTotal.toFixed(2)}`;
+        saldoGeral.textContent = `R$ ${total.toFixed(2)}`;
+        receitas.textContent = `R$ ${receitaTotal.toFixed(2)}`;
+        despesas.textContent = `R$ ${despesaTotal.toFixed(2)}`;
 
-                atualizarGraficoDespesas(despesasCategoria); 
-            })
-            .catch(error => console.error('Erro ao carregar transações:', error));
+        atualizarGraficoDespesas(despesasCategoria);
     }
 
     function atualizarGraficoDespesas(despesasCategoria) {
@@ -101,10 +96,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    formCategoria.addEventListener('submit', function(event) {
+    formCategory.addEventListener('submit', async function(event) {
         event.preventDefault();
+
         const name = document.getElementById('categoria-nome').value;
-        fetch('categorys', {
+
+        const response = await fetch('categorys', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -112,21 +109,22 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify({
                 "name": name
             })
-        })
-        .then(response => response.json())
-        .then(() => {
-            loadCategorys(); 
-            formCategoria.reset();
-        })
-        .catch(error => console.error('Erro ao adicionar categoria:', error));
+        });
+
+        const jsonResponse = await response.json();
+        alert(jsonResponse.message || "Categoria criada com sucesso");
+        loadCategories()
+        formCategory.reset();
     });
 
-    formTransacao.addEventListener('submit', function(event) {
+    formTransaction.addEventListener('submit', async function(event) {
         event.preventDefault();
+
         const description = document.getElementById('transacao-descricao').value;
         const value = parseFloat(document.getElementById('transacao-valor').value);
         const category_id = parseInt(document.getElementById('transacao-categoria').value);
-        fetch('/transactions', {
+
+        const response = await fetch('/transactions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -139,14 +137,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
         })
-        .then(response => response.json())
-        .then(() => {
-            loadTransactions();
-            formTransacao.reset(); 
-        })
-        .catch(error => console.error('Erro ao adicionar transação:', error));
+        
+        const jsonResponse = await response.json();
+        alert(jsonResponse.message || "Transação criada com sucesso");
+        loadTransactions();
+        formTransaction.reset();
     });
 
-    loadCategorys();
+    loadCategories();
     loadTransactions();
 });
