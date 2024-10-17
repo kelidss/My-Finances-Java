@@ -3,16 +3,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const formTransaction = document.getElementById('form-transacao');
     const listTransactions = document.getElementById('lista-transacoes');
     const saldoGeral = document.getElementById('valor-total');
-    const receitas = document.getElementById('receitas');
-    const despesas = document.getElementById('despesas');
     const selectCategory = document.getElementById('transacao-categoria');
     const ctx = document.getElementById('despesas-chart').getContext('2d'); 
+    let categories_to_map = "";
 
     let despesasChart = null; 
 
     async function loadCategories() {
         const response = await fetch('/categorys');
         const categories = await response.json();
+
+        categories_to_map = categories;
 
         selectCategory.innerHTML = '';
 
@@ -57,43 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         saldoGeral.textContent = `R$ ${total.toFixed(2)}`;
-        receitas.textContent = `R$ ${receitaTotal.toFixed(2)}`;
-        despesas.textContent = `R$ ${despesaTotal.toFixed(2)}`;
 
         atualizarGraficoDespesas(despesasCategoria);
-    }
-
-    function atualizarGraficoDespesas(despesasCategoria) {
-        if (despesasChart) {
-            despesasChart.destroy(); 
-        }
-
-        despesasChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(despesasCategoria),
-                datasets: [{
-                    label: 'Despesas por Categoria',
-                    data: Object.values(despesasCategoria),
-                    backgroundColor: '#3498db',
-                    borderColor: '#2980b9',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return `R$ ${value}`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
     }
 
     formCategory.addEventListener('submit', async function(event) {
@@ -143,6 +109,51 @@ document.addEventListener('DOMContentLoaded', function() {
         loadTransactions();
         formTransaction.reset();
     });
+
+    function atualizarGraficoDespesas(despesasCategoria) {
+        const categories_names = categories_to_map.map(category => category.name);
+        const categoriesColors = gerarCoresAleatorias(categories_names.length);
+
+        if (despesasChart) {
+            despesasChart.destroy(); 
+        }
+        
+        despesasChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(despesasCategoria),
+                datasets: [{
+                    label: 'Despesas por Categoria',
+                    data: Object.values(despesasCategoria),
+                    backgroundColor: categoriesColors,
+                    borderColor: '#2980b9',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return `R$ ${value}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function gerarCoresAleatorias(num) {
+        const cores = [];
+        for (let i = 0; i < num; i++) {
+            const corAleatoria = `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`;
+            cores.push(corAleatoria);
+        }
+        return cores;
+    }
 
     loadCategories();
     loadTransactions();
