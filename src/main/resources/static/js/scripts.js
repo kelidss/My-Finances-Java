@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const listTransactions = document.getElementById('lista-transacoes');
     const saldoGeral = document.getElementById('valor-total');
     const selectCategory = document.getElementById('transacao-categoria');
-    const ctx = document.getElementById('despesas-chart').getContext('2d'); 
     let categories_to_map = "";
 
     let despesasChart = null; 
@@ -110,14 +109,9 @@ document.addEventListener('DOMContentLoaded', function() {
         formTransaction.reset();
     });
 
-    function atualizarGraficoDespesas(despesasCategoria) {
-        const categories_names = categories_to_map.map(category => category.name);
-        const categoriesColors = gerarCoresAleatorias(categories_names.length);
+    function atualizarGraficoDespesas(despesasCategoria){
+        const ctx = document.getElementById('despesas-chart').getContext('2d');
 
-        if (despesasChart) {
-            despesasChart.destroy(); 
-        }
-        
         despesasChart = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -125,34 +119,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: 'Despesas por Categoria',
                     data: Object.values(despesasCategoria),
-                    backgroundColor: categoriesColors,
-                    borderColor: '#2980b9',
+                    backgroundColor: [
+                        '#FF4D4D', 
+                        '#FFCC00', 
+                        '#66FF66',
+                        '#4CAF50',
+                    ],
+                    borderColor: '#1E1E1E', 
                     borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#E0E0E0' 
+                        }
+                    }
+                },
                 scales: {
                     y: {
                         beginAtZero: true,
                         ticks: {
+                            color: '#D1D1D1', 
                             callback: function(value) {
                                 return `R$ ${value}`;
                             }
+                        },
+                        grid: {
+                            color: '#444' 
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#D1D1D1' 
+                        },
+                        grid: {
+                            color: '#444' 
                         }
                     }
                 }
             }
         });
-    }
-
-    function gerarCoresAleatorias(num) {
-        const cores = [];
-        for (let i = 0; i < num; i++) {
-            const corAleatoria = `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`;
-            cores.push(corAleatoria);
-        }
-        return cores;
     }
 
     loadCategories();

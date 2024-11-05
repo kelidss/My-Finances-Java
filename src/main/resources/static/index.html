@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle Financeiro Pessoal</title>
-    <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Incluindo o Chart.js -->
+    <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -16,6 +15,13 @@
         </header>
 
         <main>
+            <section id="acesso-rapido">
+                <div class="btn-acesso"><i class="fas fa-wallet"></i> Despesa</div>
+                <div class="btn-acesso"><i class="fas fa-donate"></i> Receita</div>
+                <div class="btn-acesso"><i class="fas fa-exchange-alt"></i> Transf.</div>
+                <div class="btn-acesso"><i class="fas fa-upload"></i> Importar</div>
+            </section>
+
             <section id="categoria-form">
                 <h2>Adicionar Categoria</h2>
                 <form id="form-categoria">
@@ -34,30 +40,29 @@
                 </form>
             </section>
 
-            <section id="transacoes">
-                <h2>Transações</h2> 
-                <ul id="lista-transacoes"></ul>
-            </section>
-
-            <section id="carteira">
-                <h2>Carteira do Mês</h2>
-                <div id="total-mes" class="total-mes">
-                    <p>Total: <span id="valor-total">R$ 0,00</span></p>
+            <div class="dashboard">
+                <div class="statistics-container">
+                    <div class="balance-overview">
+                        <h3>Resumo Financeiro</h3>
+                        <p>Total de Receitas: <span class="highlight" id="total-receitas">R$ 2000,00</span></p>
+                        <p>Total de Despesas: <span class="highlight" id="total-despesas">R$ 1500,00</span></p>
+                        <p>Saldo Geral: <span class="highlight" id="valor-total">R$ 500,00</span></p>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>Despesas por Categoria</h3>
+                        <canvas id="despesas-chart"></canvas>
+                    </div>
                 </div>
-                <!-- Canvas para o gráfico -->
-                <div id="grafico">
-                    <canvas id="despesas-chart" width="400" height="200"></canvas>
+        
+                <div class="transaction-list">
+                    <h3>Lista de Transações</h3>
+                    <ul id="lista-transacoes"></ul>
                 </div>
-            </section>
-
-            <section id="acesso-rapido">
-                <div class="btn-acesso"><i class="fas fa-wallet"></i> Despesa</div>
-                <div class="btn-acesso"><i class="fas fa-donate"></i> Receita</div>
-                <div class="btn-acesso"><i class="fas fa-exchange-alt"></i> Transf.</div>
-                <div class="btn-acesso"><i class="fas fa-upload"></i> Importar</div>
-            </section>
+            </div>
         </main>
     </div>
+
     <script src="js/scripts.js"></script>
 </body>
 </html>
