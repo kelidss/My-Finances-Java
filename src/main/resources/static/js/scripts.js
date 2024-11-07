@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const formCategory = document.getElementById('form-categoria');
     const formTransaction = document.getElementById('form-transacao');
     const listTransactions = document.getElementById('lista-transacoes');
-    const saldoGeral = document.getElementById('valor-total');
+    const saldoTotal = document.getElementById('valor-total');
+    const saldoReceitas = document.getElementById('total-receitas');
+    const saldoDespesas = document.getElementById('total-despesas');
     const selectCategory = document.getElementById('transacao-categoria');
     let categories_to_map = "";
-
-    let despesasChart = null; 
 
     async function loadCategories() {
         const response = await fetch('/categorys');
@@ -56,7 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        saldoGeral.textContent = `R$ ${total.toFixed(2)}`;
+        saldoTotal.textContent = `R$ ${total.toFixed(2)}`;
+        saldoReceitas.textContent = `R$ ${receitaTotal.toFixed(2)}`;
+        saldoDespesas.textContent = `R$ ${despesaTotal.toFixed(2)}`;
 
         atualizarGraficoDespesas(despesasCategoria);
     }
@@ -112,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function atualizarGraficoDespesas(despesasCategoria){
         const ctx = document.getElementById('despesas-chart').getContext('2d');
 
-        despesasChart = new Chart(ctx, {
+        const despesasChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: Object.keys(despesasCategoria),
