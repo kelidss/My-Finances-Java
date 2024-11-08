@@ -1,6 +1,5 @@
 package com.api.my_finances.services;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,19 +7,17 @@ import com.api.my_finances.models.Category;
 import com.api.my_finances.repositorys.CategoryRepository;
 
 @Service
-public class CategoryService {
+public class CategoryService extends BaseService<Category, Long>{
 
-    @Autowired
     private CategoryRepository categoryRepository;
 
-    public List<Category> listAll(){
-        try{
-            return categoryRepository.findAll();
-        } catch (Exception e){
-            throw new RuntimeException("Não possivel carregar as caregorias no momento");
-        }
+    @Autowired
+    public CategoryService(CategoryRepository categoryRepository){
+        super(categoryRepository, "categoria");
+        this.categoryRepository = categoryRepository;
     }
 
+    @Override
     public Category save(Category category){
         
         // verifica se nome nao e vazio
@@ -39,13 +36,5 @@ public class CategoryService {
         }
 
         return categoryRepository.save(category); // retorna o ID
-    }
-
-    public String delete(Long id){
-        if(!categoryRepository.existsById(id)){
-            throw new IllegalArgumentException("ID não existe.");
-        }
-        categoryRepository.deleteById(id);
-        return "Deletado com sucesso";
     }
 }

@@ -1,6 +1,5 @@
 package com.api.my_finances.services;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,18 +9,19 @@ import com.api.my_finances.repositorys.CategoryRepository;
 import com.api.my_finances.repositorys.TransactionRepository;
 
 @Service
-public class TransactionService {
+public class TransactionService extends BaseService<Transaction, Long>{
 
-    @Autowired
     private TransactionRepository transactionRepository;
-
-    @Autowired
     private CategoryRepository categoryRepository;
 
-    public List<Transaction> listAll(){
-        return transactionRepository.findAll();
+    @Autowired
+    public TransactionService(TransactionRepository transactionRepository, CategoryRepository categoryRepository) {
+        super(transactionRepository, "transação");
+        this.transactionRepository = transactionRepository;
+        this.categoryRepository = categoryRepository;
     }
 
+    // @Override
     public Transaction save(Transaction transaction){
         // Verifica se a transacao tem uma categoria e se o ID da categoria esta presente
         if (transaction.getCategory() != null && transaction.getCategory().getId() != null) {
@@ -37,9 +37,5 @@ public class TransactionService {
 
         // Salva a transacao com a categoria associada
         return transactionRepository.save(transaction);
-    }
-
-    public void delete(Long id){
-        transactionRepository.deleteById(id);
     }
 }
