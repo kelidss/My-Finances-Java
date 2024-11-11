@@ -21,7 +21,7 @@ public class TransactionService extends BaseService<Transaction, Long>{
         this.categoryRepository = categoryRepository;
     }
 
-    // @Override
+    @Override
     public Transaction save(Transaction transaction){
         // Verifica se a transacao tem uma categoria e se o ID da categoria esta presente
         if (transaction.getCategory() != null && transaction.getCategory().getId() != null) {
