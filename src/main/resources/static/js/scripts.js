@@ -33,54 +33,57 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadTransactions(filterDate = null) {
         const response = await fetch('/transactions');
         const transactions = await response.json();
-
+    
         let total = 0;
         let receitaTotal = 0;
         let despesaTotal = 0;
         const despesasCategoria = {};
-        let totalFiltradoValor = 0;  
-
+        let totalFiltradoValor = 0;
+    
         listTransactions.innerHTML = '';
-
+    
         transactions.forEach(transaction => {
             const transactionDate = new Date(transaction.createdAt);
-            const formattedDate = `${transactionDate.getDate().toString().padStart(2, '0')}/${(transactionDate.getMonth() + 1).toString().padStart(2, '0')}/${transactionDate.getFullYear()}`;
-
-            if (filterDate && filterDate !== formattedDate) {
+            const formattedTransactionDate = transactionDate.toISOString().split('T')[0]; 
+    
+            if (filterDate && filterDate !== formattedTransactionDate) {
                 return;  
             }
-
+    
+            const formattedDate = `${transactionDate.getDate().toString().padStart(2, '0')}/${(transactionDate.getMonth() + 1).toString().padStart(2, '0')}/${transactionDate.getFullYear()}`;
+    
             const li = document.createElement('li');
             li.textContent = `${transaction.description} - R$ ${transaction.value.toFixed(2)} - Categoria: ${transaction.category.name} - Data: ${formattedDate}`;
             listTransactions.appendChild(li);
-
+    
             total += transaction.value;
             if (transaction.value > 0) {
                 receitaTotal += transaction.value;
             } else {
                 despesaTotal += Math.abs(transaction.value);
-
+    
                 if (!despesasCategoria[transaction.category.name]) {
                     despesasCategoria[transaction.category.name] = 0;
                 }
                 despesasCategoria[transaction.category.name] += Math.abs(transaction.value);
             }
-
+    
             totalFiltradoValor += transaction.value;
         });
-
+    
         saldoTotal.textContent = `R$ ${total.toFixed(2)}`;
         saldoReceitas.textContent = `R$ ${receitaTotal.toFixed(2)}`;
         saldoDespesas.textContent = `R$ ${despesaTotal.toFixed(2)}`;
         totalFiltrado.textContent = `R$ ${totalFiltradoValor.toFixed(2)}`;
-
+    
         atualizarGraficoDespesas(despesasCategoria);
     }
-
+    
     document.getElementById('apply-filter').addEventListener('click', function() {
         const filterDate = filterDateInput.value ? filterDateInput.value : null;
         loadTransactions(filterDate);
     });
+    
 
     formCategory.addEventListener('submit', async function(event) {
         event.preventDefault();
