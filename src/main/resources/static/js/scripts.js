@@ -78,12 +78,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
         atualizarGraficoDespesas(despesasCategoria);
     }
-    
+
     document.getElementById('apply-filter').addEventListener('click', function() {
         const filterDate = filterDateInput.value ? filterDateInput.value : null;
         loadTransactions(filterDate);
     });
-    
+
+    document.getElementById('clear-filter').addEventListener('click', function() {
+        filterDateInput.value = ''; 
+        loadTransactions();  
+    });
 
     formCategory.addEventListener('submit', async function(event) {
         event.preventDefault();

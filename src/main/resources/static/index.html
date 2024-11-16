@@ -50,11 +50,13 @@
                     </div>
                     <div class="filter-container">
                         <label for="filter-date">Filtrar por Data:</label>
-                        <input type="date" id="filter-date">
-                        <button id="apply-filter">Aplicar Filtro</button>
+                        <div class="date-filter-container">
+                            <input type="date" id="filter-date" placeholder="Selecione uma data">
+                            <button id="apply-filter" class="filter-button">Aplicar Filtro</button>
+                            <button id="clear-filter" class="clear-button">Limpar</button>
+                        </div>
                         <p>Total Filtrado: <span id="total-filtrado">R$ 0,00</span></p>
-                    </div>
-                    
+                    </div>                    
                     <div class="chart-container">
                         <h3>Despesas por Categoria</h3>
                         <canvas id="despesas-chart"></canvas>
