@@ -31,6 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function loadTransactions(filterDate = null) {
+    
+        totalFiltrado.textContent = `R$ 0,00`;
+
         const response = await fetch('/transactions');
         const transactions = await response.json();
     
@@ -74,11 +77,15 @@ document.addEventListener('DOMContentLoaded', function() {
         saldoTotal.textContent = `R$ ${total.toFixed(2)}`;
         saldoReceitas.textContent = `R$ ${receitaTotal.toFixed(2)}`;
         saldoDespesas.textContent = `R$ ${despesaTotal.toFixed(2)}`;
-        totalFiltrado.textContent = `R$ ${totalFiltradoValor.toFixed(2)}`;
+    
+
+        if (filterDate) {
+            totalFiltrado.textContent = `R$ ${totalFiltradoValor.toFixed(2)}`;
+        }
     
         atualizarGraficoDespesas(despesasCategoria);
     }
-
+    
     document.getElementById('apply-filter').addEventListener('click', function() {
         const filterDate = filterDateInput.value ? filterDateInput.value : null;
         loadTransactions(filterDate);
@@ -86,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('clear-filter').addEventListener('click', function() {
         filterDateInput.value = ''; 
-        loadTransactions();  
+        loadTransactions(); 
     });
 
     formCategory.addEventListener('submit', async function(event) {
