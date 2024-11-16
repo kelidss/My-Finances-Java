@@ -19,7 +19,7 @@
                 <div class="btn-acesso"><i class="fas fa-wallet"></i> Despesa</div>
                 <div class="btn-acesso"><i class="fas fa-donate"></i> Receita</div>
                 <div class="btn-acesso"><i class="fas fa-exchange-alt"></i> Transf.</div>
-                <div class="btn-acesso"><i class="fas fa-upload"></i> Importar</div>
+                <div class="btn-acesso" id="btn-exportar"><i class="fas fa-file-download"></i> Exportar</div>
             </section>
 
             <section id="categoria-form">
@@ -48,6 +48,12 @@
                         <p>Total de Despesas: <span class="highlight" id="total-despesas"></span></p>
                         <p>Saldo Geral: <span class="highlight" id="valor-total"></span></p>
                     </div>
+                    <div class="filter-container">
+                        <label for="filter-date">Filtrar por Data:</label>
+                        <input type="date" id="filter-date">
+                        <button id="apply-filter">Aplicar Filtro</button>
+                        <p>Total Filtrado: <span id="total-filtrado">R$ 0,00</span></p>
+                    </div>
                     
                     <div class="chart-container">
                         <h3>Despesas por Categoria</h3>
@@ -62,7 +68,27 @@
             </div>
         </main>
     </div>
-
     <script src="js/scripts.js"></script>
+
+    <script>
+        document.getElementById('btn-exportar').addEventListener('click', function() {
+            fetch('/exportar-excel', { 
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.blob())
+            .then(blob => {
+        
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'relatorio_financeiro.xlsx';  
+                link.click();  
+            })
+            .catch(error => console.error('Erro ao exportar o Excel:', error));
+        });
+    </script>
 </body>
 </html>
+

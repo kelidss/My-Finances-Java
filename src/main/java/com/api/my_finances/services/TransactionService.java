@@ -8,8 +8,11 @@ import com.api.my_finances.models.Transaction;
 import com.api.my_finances.repositorys.CategoryRepository;
 import com.api.my_finances.repositorys.TransactionRepository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
-public class TransactionService extends BaseService<Transaction, Long>{
+public class TransactionService extends BaseService<Transaction, Long> {
 
     private TransactionRepository transactionRepository;
     private CategoryRepository categoryRepository;
@@ -22,20 +25,21 @@ public class TransactionService extends BaseService<Transaction, Long>{
     }
 
     @Override
-    public Transaction save(Transaction transaction){
-        // Verifica se a transacao tem uma categoria e se o ID da categoria esta presente
+    public Transaction save(Transaction transaction) {
         if (transaction.getCategory() != null && transaction.getCategory().getId() != null) {
-            // Busca a categoria no banco de dados pelo ID
             Category category = categoryRepository.findById(transaction.getCategory().getId())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
 
-            // Associa a categoria encontrada a transacao
             transaction.setCategory(category);
         } else {
             throw new RuntimeException("Categoria inválida ou não fornecida");
         }
 
-        // Salva a transacao com a categoria associada
+        transaction.setCreatedAt(LocalDateTime.now());
         return transactionRepository.save(transaction);
+    }
+
+    public List<Transaction> getAll() {
+        return transactionRepository.findAll();  
     }
 }
