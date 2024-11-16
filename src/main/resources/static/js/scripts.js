@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const saldoReceitas = document.getElementById('total-receitas');
     const saldoDespesas = document.getElementById('total-despesas');
     const selectCategory = document.getElementById('transacao-categoria');
+    const filterDateInput = document.getElementById('filter-date');
+    const totalFiltrado = document.getElementById('total-filtrado');
     let categories_to_map = "";
 
     async function loadCategories() {
@@ -15,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
         categories_to_map = categories;
 
         selectCategory.innerHTML = '';
-
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
         defaultOption.textContent = 'Categoria';
@@ -29,43 +30,60 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    async function loadTransactions() {
+    async function loadTransactions(filterDate = null) {
         const response = await fetch('/transactions');
         const transactions = await response.json();
-                
+
         let total = 0;
         let receitaTotal = 0;
         let despesaTotal = 0;
-        const despesasCategoria = {}; 
+        const despesasCategoria = {};
+        let totalFiltradoValor = 0;  
+
         listTransactions.innerHTML = '';
 
         transactions.forEach(transaction => {
+            const transactionDate = new Date(transaction.createdAt);
+            const formattedDate = `${transactionDate.getDate().toString().padStart(2, '0')}/${(transactionDate.getMonth() + 1).toString().padStart(2, '0')}/${transactionDate.getFullYear()}`;
+
+            if (filterDate && filterDate !== formattedDate) {
+                return;  
+            }
+
             const li = document.createElement('li');
-            li.textContent = `${transaction.description} - R$ ${transaction.value.toFixed(2)} - Categoria: ${transaction.category.name}`;
+            li.textContent = `${transaction.description} - R$ ${transaction.value.toFixed(2)} - Categoria: ${transaction.category.name} - Data: ${formattedDate}`;
             listTransactions.appendChild(li);
+
             total += transaction.value;
             if (transaction.value > 0) {
                 receitaTotal += transaction.value;
             } else {
                 despesaTotal += Math.abs(transaction.value);
-                
+
                 if (!despesasCategoria[transaction.category.name]) {
                     despesasCategoria[transaction.category.name] = 0;
                 }
                 despesasCategoria[transaction.category.name] += Math.abs(transaction.value);
             }
+
+            totalFiltradoValor += transaction.value;
         });
 
         saldoTotal.textContent = `R$ ${total.toFixed(2)}`;
         saldoReceitas.textContent = `R$ ${receitaTotal.toFixed(2)}`;
         saldoDespesas.textContent = `R$ ${despesaTotal.toFixed(2)}`;
+        totalFiltrado.textContent = `R$ ${totalFiltradoValor.toFixed(2)}`;
 
         atualizarGraficoDespesas(despesasCategoria);
     }
 
+    document.getElementById('apply-filter').addEventListener('click', function() {
+        const filterDate = filterDateInput.value ? filterDateInput.value : null;
+        loadTransactions(filterDate);
+    });
+
     formCategory.addEventListener('submit', async function(event) {
         event.preventDefault();
-
         const name = document.getElementById('categoria-nome').value;
 
         const response = await fetch('categorys', {
@@ -73,14 +91,12 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                "name": name
-            })
+            body: JSON.stringify({ "name": name })
         });
 
         const jsonResponse = await response.json();
         alert(jsonResponse.message || "Categoria criada com sucesso");
-        loadCategories()
+        loadCategories();
         formCategory.reset();
     });
 
@@ -96,22 +112,20 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 "description": description,
                 "value": value,
-                "category": {
-                    "id": category_id
-                }
+                "category": { "id": category_id }
             })
-        })
-        
+        });
+
         const jsonResponse = await response.json();
         alert(jsonResponse.message || "Transação criada com sucesso");
         loadTransactions();
         formTransaction.reset();
     });
 
-    function atualizarGraficoDespesas(despesasCategoria){
+    function atualizarGraficoDespesas(despesasCategoria) {
         const ctx = document.getElementById('despesas-chart').getContext('2d');
 
         const despesasChart = new Chart(ctx, {
@@ -121,13 +135,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: 'Despesas por Categoria',
                     data: Object.values(despesasCategoria),
-                    backgroundColor: [
-                        '#FF4D4D', 
-                        '#FFCC00', 
-                        '#66FF66',
-                        '#4CAF50',
-                    ],
-                    borderColor: '#1E1E1E', 
+                    backgroundColor: ['#FF4D4D', '#FFCC00', '#66FF66', '#4CAF50'],
+                    borderColor: '#1E1E1E',
                     borderWidth: 1
                 }]
             },
@@ -136,31 +145,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 plugins: {
                     legend: {
                         display: true,
-                        labels: {
-                            color: '#E0E0E0' 
-                        }
+                        labels: { color: '#E0E0E0' }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            color: '#D1D1D1', 
+                            color: '#D1D1D1',
                             callback: function(value) {
                                 return `R$ ${value}`;
                             }
                         },
-                        grid: {
-                            color: '#444' 
-                        }
+                        grid: { color: '#444' }
                     },
                     x: {
-                        ticks: {
-                            color: '#D1D1D1' 
-                        },
-                        grid: {
-                            color: '#444' 
-                        }
+                        ticks: { color: '#D1D1D1' },
+                        grid: { color: '#444' }
                     }
                 }
             }
