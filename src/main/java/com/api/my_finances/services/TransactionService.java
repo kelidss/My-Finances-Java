@@ -8,6 +8,7 @@ import com.api.my_finances.models.Transaction;
 import com.api.my_finances.repositorys.CategoryRepository;
 import com.api.my_finances.repositorys.TransactionRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,7 +40,15 @@ public class TransactionService extends BaseService<Transaction, Long> {
         return transactionRepository.save(transaction);
     }
 
-    public List<Transaction> getAll() {
-        return transactionRepository.findAll();  
+    public List<Transaction> listTodayOrdered() {
+        try {
+            LocalDate today = LocalDate.now();
+            LocalDateTime inicioDoDia = today.atStartOfDay();
+            LocalDateTime fimDoDia = inicioDoDia.plusDays(1);
+
+            return transactionRepository.findByAtualDate(inicioDoDia, fimDoDia);
+        } catch (Exception e) {
+            throw new RuntimeException("Não foi possível carregar as informações no momento");
+        }
     }
 }

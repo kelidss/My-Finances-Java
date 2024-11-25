@@ -34,7 +34,7 @@ public class ExcelExportController {
         headerRow.createCell(2).setCellValue("Categoria");
         headerRow.createCell(3).setCellValue("Data");
 
-        List<Transaction> transactions = transactionService.getAll();  
+        List<Transaction> transactions = transactionService.listAll();  
 
         int rowNum = 1;
         for (Transaction transaction : transactions) {

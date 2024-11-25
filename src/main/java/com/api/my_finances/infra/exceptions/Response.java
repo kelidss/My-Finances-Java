@@ -1,4 +1,4 @@
-package com.api.my_finances.exceptions;
+package com.api.my_finances.infra.exceptions;
 
 public class Response {
     private int status;
