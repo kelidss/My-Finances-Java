@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const jwtToken = localStorage.getItem('jwtToken');
+
     const formCategory = document.getElementById('form-categoria');
     const formTransaction = document.getElementById('form-transacao');
     const listTransactions = document.getElementById('lista-transacoes');
@@ -34,7 +36,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
         totalFiltrado.textContent = `R$ 0,00`;
 
-        const response = await fetch('/transactions');
+        const response = await fetch('/transactions', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
         const transactions = await response.json();
     
         let total = 0;
